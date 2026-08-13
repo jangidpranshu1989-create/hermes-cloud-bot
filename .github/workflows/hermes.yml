@@ -1,0 +1,35 @@
+name: 24-7 Hermes Copilot Agent
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Hermes Agent
+        run: |
+          pip install hermes-agent
+
+      - name: Run Hermes Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        run: |
+          export HERMES_COV_TOKEN=$GITHUB_TOKEN
+          # This runs your bot and keeps it listening in the cloud
+          hermes gateway --provider copilot --gateway telegram --token $TELEGRAM_BOT_TOKEN &
+          
+          # Keep-alive loop to prevent GitHub from turning off
+          echo "Hermes Cloud Agent is now online!"
+          sleep 21000
