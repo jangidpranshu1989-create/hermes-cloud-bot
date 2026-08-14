@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 
 def setup_hermes():
+    print(f"DEBUG: GITHUB_TOKEN length = {len(os.getenv('GITHUB_TOKEN', ''))}")
     os.makedirs(os.path.expanduser("~/.hermes"), exist_ok=True)
 
     # Environment profile update logic
