@@ -1,2 +1,4 @@
 hermes-agent
-mcp>=1.9.0
+mcp[cli]>=0.1.0
+
+
