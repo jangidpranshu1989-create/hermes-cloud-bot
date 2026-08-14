@@ -21,22 +21,26 @@ jobs:
         run: |
           pip install hermes-agent
 
-      - name: Run Hermes Telegram Gateway
+      - name: Configure Nvidia Provider and Launch
         env:
-          GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_ALLOWED_USERS: ${{ secrets.TELEGRAM_USER_ID }}
         run: |
-          export HERMES_COV_TOKEN=$GITHUB_TOKEN
-          echo "Starting Hermes Telegram Bot with Safe Security..."
-          
-          # Allowed users setting configure kar rahe hain
           mkdir -p ~/.hermes
-          echo "telegram:" > ~/.hermes/config.yaml
-          echo "  allowed_users: [\"$TELEGRAM_ALLOWED_USERS\"]" >> ~/.hermes/config.yaml
           
-          # Launch Telegram Bot
-          hermes gateway --provider copilot --gateway telegram --token $TELEGRAM_BOT_TOKEN &
+          # Exact config building based on your local audit
+          cat << EOC > ~/.hermes/config.yaml
+          provider: nvidia
+          model:
+            default: "minimaxai/minimax-m2.7"
+            provider: "nvidia"
+            base_url: "https://integrate.api.nvidia.com/v1"
+          messaging:
+            gateway: telegram
+          telegram:
+            token: "$TELEGRAM_BOT_TOKEN"
+            allowed_users: ["$TELEGRAM_ALLOWED_USERS"]
+          EOC
           
-          echo "Hermes Cloud Agent is now listening!"
-          sleep 21000
+          echo "Starting Cloud Bot with Local Verified Config..."
+          hermes gateway run telegram
