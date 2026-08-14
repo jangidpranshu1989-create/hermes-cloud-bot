@@ -41,6 +41,8 @@ def setup_hermes():
         f.write("    headers:\n")
         f.write(f"      x-consumer-api-key: \"{os.getenv('COMPOSIO_API_KEY')}\"\n")
 
+    with open(os.path.expanduser("~/.hermes/config.yaml")) as _f:
+        print("DEBUG CONFIG:\n" + _f.read(), flush=True)
     print("Launching Correct Hermes Gateway Bridge...")
 
     subprocess.Popen("hermes gateway run --replace", shell=True)
