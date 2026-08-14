@@ -29,10 +29,10 @@ jobs:
         run: |
           mkdir -p ~/.hermes
           
-          # Injecting the environment file explicitly for the cloud runner
+          # Environment key binding
           echo "NVIDIA_API_KEY=$NVIDIA_API_KEY" > ~/.hermes/.env
           
-          # Injecting strict config file format matching your phone configuration
+          # Direct layout configurations
           cat << EOC > ~/.hermes/config.yaml
           provider: nvidia
           model:
@@ -46,5 +46,6 @@ jobs:
             allowed_users: ["$TELEGRAM_ALLOWED_USERS"]
           EOC
           
-          echo "Launching Cloud Server Engine in Foreground Listen Mode..."
-          hermes gateway run telegram
+          echo "Launching Cloud Server Engine with serve mode..."
+          # Fix: Using 'serve' command with gateway parameter to prevent crash
+          hermes serve --gateway telegram
