@@ -48,4 +48,4 @@ jobs:
           
           echo "Launching Cloud Server Engine with serve mode..."
           # Fix: Using 'serve' command with gateway parameter to prevent crash
-          hermes serve --gateway telegram
+          hermes serve
