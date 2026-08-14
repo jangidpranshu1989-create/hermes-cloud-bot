@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 
 def setup_hermes():
+    print(f"DEBUG: COMPOSIO_API_KEY length = {len(os.getenv('COMPOSIO_API_KEY', ''))}")
     os.makedirs(os.path.expanduser("~/.hermes"), exist_ok=True)
 
     # Environment profile update logic
