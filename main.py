@@ -10,6 +10,7 @@ def setup_hermes():
     with open(os.path.expanduser("~/.hermes/.env"), "w") as f:
         f.write(f"GITHUB_TOKEN={os.getenv('GITHUB_TOKEN')}\n")
         f.write(f"KILOCODE_API_KEY={os.getenv('KILOCODE_API_KEY')}\n")
+        f.write(f"COMPOSIO_API_KEY={os.getenv('COMPOSIO_API_KEY')}\n")
         f.write(f"TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN')}\n")
         f.write(f"TELEGRAM_ALLOWED_USERS={os.getenv('TELEGRAM_ALLOWED_USERS')}\n")
 
@@ -33,6 +34,11 @@ def setup_hermes():
         f.write("telegram:\n")
         f.write(f"  token: \"{os.getenv('TELEGRAM_BOT_TOKEN')}\"\n")
         f.write(f"  allowed_users: [\"{os.getenv('TELEGRAM_ALLOWED_USERS')}\"]\n")
+        f.write("mcp_servers:\n")
+        f.write("  composio:\n")
+        f.write("    url: \"https://connect.composio.dev/mcp\"\n")
+        f.write("    headers:\n")
+        f.write(f"      x-consumer-api-key: \"{os.getenv('COMPOSIO_API_KEY')}\"\n")
 
     print("Launching Correct Hermes Gateway Bridge...")
 
