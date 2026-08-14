@@ -1,4 +1,4 @@
-name: 24-7 Hermes Copilot Agent
+name: 24-7 Hermes WhatsApp Agent
 
 on:
   workflow_dispatch:
@@ -21,10 +21,16 @@ jobs:
         run: |
           pip install hermes-agent
 
-      - name: Run Hermes WhatsApp Gateway
+      - name: Auto-Configure and Launch WhatsApp
         env:
           GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
         run: |
           export HERMES_COV_TOKEN=$GITHUB_TOKEN
-          # WhatsApp mode start
+          
+          # Pehle se hi setup configurations inject kar rahe hain taaki interactive prompt na ruke
+          mkdir -p ~/.hermes
+          echo "gateway: whatsapp" > ~/.hermes/config.yaml
+          echo "whatsapp_mode: self" >> ~/.hermes/config.yaml
+          
+          # Force start the gateway to print QR Code directly into the active terminal logs
           hermes gateway --provider copilot --gateway whatsapp
