@@ -4,12 +4,12 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 
 def setup_hermes():
-    print(f"DEBUG: GITHUB_TOKEN length = {len(os.getenv('GITHUB_TOKEN', ''))}")
     os.makedirs(os.path.expanduser("~/.hermes"), exist_ok=True)
 
     # Environment profile update logic
     with open(os.path.expanduser("~/.hermes/.env"), "w") as f:
         f.write(f"GITHUB_TOKEN={os.getenv('GITHUB_TOKEN')}\n")
+        f.write(f"KILOCODE_API_KEY={os.getenv('KILOCODE_API_KEY')}\n")
         f.write(f"TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN')}\n")
         f.write(f"TELEGRAM_ALLOWED_USERS={os.getenv('TELEGRAM_ALLOWED_USERS')}\n")
 
@@ -20,6 +20,10 @@ def setup_hermes():
         f.write("  provider: copilot\n")
         f.write("  base_url: https://api.githubcopilot.com\n")
         f.write("  api_mode: chat_completions\n")
+        f.write("fallback_model:\n")
+        f.write("  provider: kilocode\n")
+        f.write("  model: \"nvidia/nemotron-3-ultra-550b-a55b:free\"\n")
+        f.write("  base_url: https://api.kilo.ai/api/gateway\n")
         f.write("memory:\n")
         f.write("  backend: postgresql\n")
         f.write(f"  url: \"{os.getenv('SUPABASE_URL')}\"\n")
