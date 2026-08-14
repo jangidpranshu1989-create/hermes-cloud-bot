@@ -25,12 +25,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_ALLOWED_USERS: ${{ secrets.TELEGRAM_USER_ID }}
         run: |
           export HERMES_COV_TOKEN=$GITHUB_TOKEN
-          echo "Starting Hermes Telegram Bot..."
+          echo "Starting Hermes Telegram Bot with Safe Security..."
           
-          # Telegram gateway ko launch karenge aur background loop me dalenge
+          # Allowed users setting configure kar rahe hain
+          mkdir -p ~/.hermes
+          echo "telegram:" > ~/.hermes/config.yaml
+          echo "  allowed_users: [\"$TELEGRAM_ALLOWED_USERS\"]" >> ~/.hermes/config.yaml
+          
+          # Launch Telegram Bot
           hermes gateway --provider copilot --gateway telegram --token $TELEGRAM_BOT_TOKEN &
           
-          # Keep-alive loop taaki cloud server 24/7 chalta rahe
+          echo "Hermes Cloud Agent is now listening!"
           sleep 21000
