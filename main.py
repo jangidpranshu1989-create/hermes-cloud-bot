@@ -2,20 +2,44 @@ import os
 import subprocess
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
+import json
+import urllib.request  # बिना किसी एक्स्ट्रा पैकेज (जैसे requests) के वेबहुक भेजने के लिए
+
+def send_to_make_webhook(message_text, user_id):
+    """Make.com Webhook पर डेटा भेजने का फंक्शन"""
+    webhook_url = os.getenv('WEBHOOK_URL')
+    if not webhook_url:
+        print("DEBUG: WEBHOOK_URL Environment Variable missing!", flush=True)
+        return
+    
+    data = {
+        "message": message_text,
+        "user_id": user_id,
+        "agent": "Hermes Agent"
+    }
+    
+    try:
+        req = urllib.request.Request(
+            webhook_url, 
+            data=json.dumps(data).encode('utf-8'), 
+            headers={'Content-Type': 'application/json'}
+        )
+        with urllib.request.urlopen(req) as response:
+            print(f"DEBUG: Data sent to Make.com! Status code: {response.getcode()}", flush=True)
+    except Exception as e:
+        print(f"DEBUG: Error sending to Make.com: {e}", flush=True)
 
 def setup_hermes():
-    print(f"DEBUG: COMPOSIO_API_KEY length = {len(os.getenv('COMPOSIO_API_KEY', ''))}", flush=True)
     os.makedirs(os.path.expanduser("~/.hermes"), exist_ok=True)
 
     # Environment profile update logic
     with open(os.path.expanduser("~/.hermes/.env"), "w") as f:
         f.write(f"GITHUB_TOKEN={os.getenv('GITHUB_TOKEN')}\n")
         f.write(f"KILOCODE_API_KEY={os.getenv('KILOCODE_API_KEY')}\n")
-        f.write(f"COMPOSIO_API_KEY={os.getenv('COMPOSIO_API_KEY')}\n")
         f.write(f"TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN')}\n")
         f.write(f"TELEGRAM_ALLOWED_USERS={os.getenv('TELEGRAM_ALLOWED_USERS')}\n")
 
-    # Exact configurations building
+    # Exact configurations building (Composio Block Removed to fix error)
     with open(os.path.expanduser("~/.hermes/config.yaml"), "w") as f:
         f.write("model:\n")
         f.write("  default: gpt-4.1\n")
@@ -35,17 +59,12 @@ def setup_hermes():
         f.write("telegram:\n")
         f.write(f"  token: \"{os.getenv('TELEGRAM_BOT_TOKEN')}\"\n")
         f.write(f"  allowed_users: [\"{os.getenv('TELEGRAM_ALLOWED_USERS')}\"]\n")
-        f.write("mcp_servers:\n")
-        f.write("  composio:\n")
-        f.write("    url: \"https://connect.composio.dev/mcp\"\n")
-        f.write("    headers:\n")
-        f.write(f"      x-consumer-api-key: \"{os.getenv('COMPOSIO_API_KEY')}\"\n")
 
     with open(os.path.expanduser("~/.hermes/config.yaml")) as _f:
         print("DEBUG CONFIG:\n" + _f.read(), flush=True)
     print("Launching Correct Hermes Gateway Bridge...")
 
-    subprocess.run("hermes mcp test composio", shell=True)
+    # पुराना एरर टेस्ट कमांड हटा दिया गया है
     subprocess.Popen("hermes gateway run --replace", shell=True)
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -54,6 +73,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
         self.wfile.write(b"Hermes Secure Database Agent is Fully Synchronized!")
+
+        # जैसे ही Render का हेल्थ चेक पिंग (GET) आएगा या कोई बोट एक्टिविटी होगी, टेस्ट के लिए मेक को डेटा ट्रिगर करेगा
+        allowed_user = os.getenv('TELEGRAM_ALLOWED_USERS', 'Unknown')
+        threading.Thread(target=send_to_make_webhook, args=("Bot Active & Running on Render", allowed_user)).start()
 
     def do_HEAD(self):
         self.send_response(200)
