@@ -45,6 +45,7 @@ def setup_hermes():
         print("DEBUG CONFIG:\n" + _f.read(), flush=True)
     print("Launching Correct Hermes Gateway Bridge...")
 
+    subprocess.run("hermes mcp test composio", shell=True)
     subprocess.Popen("hermes gateway run --replace", shell=True)
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
