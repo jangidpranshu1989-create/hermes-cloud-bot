@@ -1,3 +1,4 @@
 hermes-agent
+composio-core
 mcp[cli]>=0.1.0
 httpx>=0.24.0
