@@ -1,4 +1,4 @@
-name: 24-7 Hermes WhatsApp Agent
+name: 24-7 Hermes Telegram Agent
 
 on:
   workflow_dispatch:
@@ -21,16 +21,16 @@ jobs:
         run: |
           pip install hermes-agent
 
-      - name: Auto-Configure and Launch WhatsApp
+      - name: Run Hermes Telegram Gateway
         env:
           GITHUB_TOKEN: ${{ secrets.COPILOT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         run: |
           export HERMES_COV_TOKEN=$GITHUB_TOKEN
+          echo "Starting Hermes Telegram Bot..."
           
-          # Pehle se hi setup configurations inject kar rahe hain taaki interactive prompt na ruke
-          mkdir -p ~/.hermes
-          echo "gateway: whatsapp" > ~/.hermes/config.yaml
-          echo "whatsapp_mode: self" >> ~/.hermes/config.yaml
+          # Telegram gateway ko launch karenge aur background loop me dalenge
+          hermes gateway --provider copilot --gateway telegram --token $TELEGRAM_BOT_TOKEN &
           
-          # Force start the gateway to print QR Code directly into the active terminal logs
-          hermes gateway --provider copilot --gateway whatsapp
+          # Keep-alive loop taaki cloud server 24/7 chalta rahe
+          sleep 21000
