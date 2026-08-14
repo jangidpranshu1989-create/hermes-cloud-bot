@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 
 def setup_hermes():
-    print("Initializing Hermes Agent with Autonomous Tools Access...", flush=True)
+    print("Initializing Hermes Agent with Composio Toolset...", flush=True)
     os.makedirs(os.path.expanduser("~/.hermes"), exist_ok=True)
 
     # 1. Environment profile setup
@@ -15,7 +15,7 @@ def setup_hermes():
         f.write(f"TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN')}\n")
         f.write(f"TELEGRAM_ALLOWED_USERS={os.getenv('TELEGRAM_ALLOWED_USERS')}\n")
 
-    # 2. Creating config.yaml with STRICT system instructions for tool usage
+    # 2. Creating config.yaml (Composio Local App Tools Integration)
     with open(os.path.expanduser("~/.hermes/config.yaml"), "w") as f:
         f.write("model:\n")
         f.write("  default: gpt-4.1\n")
@@ -26,10 +26,7 @@ def setup_hermes():
         f.write("  provider: kilocode\n")
         f.write("  model: \"nvidia/nemotron-3-ultra-550b-a55b:free\"\n")
         f.write("  base_url: https://kilo.ai\n")
-        
-        # This forces the LLM to use Composio actions instead of text guides
-        f.write("system_prompt: \"You are a powerful autonomous AI executive. You have direct backend tool access via Composio MCP. When a user asks you to create a folder, list files, write emails, or manage spreadsheets, you MUST call the appropriate composio tool immediately. Never guide the user to do it manually. Execute it yourself.\"\n")
-        
+        f.write("system_prompt: \"You are an advanced AI Agent. You have direct access to Composio tools for Gmail, Google Drive, and Notion. You MUST use these tools to execute requests directly whenever a user asks you to do a task.\"\n")
         f.write("memory:\n")
         f.write("  backend: postgresql\n")
         f.write(f"  url: \"{os.getenv('SUPABASE_URL')}\"\n")
@@ -39,16 +36,11 @@ def setup_hermes():
         f.write("telegram:\n")
         f.write(f"  token: \"{os.getenv('TELEGRAM_BOT_TOKEN')}\"\n")
         f.write(f"  allowed_users: [\"{os.getenv('TELEGRAM_ALLOWED_USERS')}\"]\n")
-        
-        # Composio Native HTTP Connection Block
-        f.write("mcp_servers:\n")
-        f.write("  composio:\n")
-        f.write("    url: \"https://composio.dev\"\n")
-        f.write("    headers:\n")
-        f.write(f"      x-consumer-api-key: \"{os.getenv('COMPOSIO_API_KEY')}\"\n")
 
-    with open(os.path.expanduser("~/.hermes/config.yaml")) as _f:
-        print("DEBUG INSTALLED CONFIG:\n" + _f.read(), flush=True)
+    print("Syncing Composio Apps Locally...", flush=True)
+    # Composio CLI के जरिए ऐप्स को लोकल एनवायरनमेंट में सिंक करना
+    subprocess.run(f"composio login {os.getenv('COMPOSIO_API_KEY')}", shell=True)
+    subprocess.run("composio apps enable gmail googledrive notion", shell=True)
 
     print("Launching Hermes Autonomous Gateway...", flush=True)
     subprocess.Popen("hermes gateway run --replace", shell=True)
@@ -58,7 +50,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(b"Hermes Secure Database Agent is Fully Synchronized with Composio!")
+        self.wfile.write(b"Hermes Agent Connected via Native Composio Tooling!")
 
     def do_HEAD(self):
         self.send_response(200)
