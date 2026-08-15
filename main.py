@@ -18,6 +18,7 @@ def _write_env() -> None:
             raise RuntimeError(f"Missing required environment variable: {key}")
         lines.append(f"{key}={val}")
     lines.append(f"TELEGRAM_ALLOWED_USERS={os.getenv('TELEGRAM_ALLOWED_USERS', '')}")
+    lines.append(f"COMPOSIO_API_KEY={os.getenv('COMPOSIO_API_KEY', '')}")
     lines.append("HERMES_LOG_LEVEL=DEBUG")
     with open(env_path, "w") as f:
         f.write("\n".join(lines) + "\n")
@@ -43,6 +44,11 @@ messaging:
 telegram:
   token: "{os.getenv('TELEGRAM_BOT_TOKEN')}"
   allowed_users: ["{allowed}"]
+mcp_servers:
+  composio:
+    url: "https://connect.composio.dev/mcp"
+    headers:
+      x-consumer-api-key: "{os.getenv('COMPOSIO_API_KEY', '')}"
 timezone: Asia/Kolkata
 """
     with open(config_path, "w") as f:
