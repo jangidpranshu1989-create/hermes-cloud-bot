@@ -49,6 +49,7 @@ mcp_servers:
     url: "https://connect.composio.dev/mcp"
     headers:
       x-consumer-api-key: "{os.getenv('COMPOSIO_API_KEY', '')}"
+    keepalive_interval: 15
 timezone: Asia/Kolkata
 """
     with open(config_path, "w") as f:
