@@ -1,0 +1,13 @@
+name: Wake Hermes Cron
+on:
+  schedule:
+    - cron: "25 2 * * *"  # 7:55 AM IST (wake before 8:00 AM IST)
+  workflow_dispatch:
+
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render service
+        run: |
+          curl -sS -o /dev/null -w "%{http_code}" https://hermes-cloud-bot.onrender.com/
